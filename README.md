@@ -17,5 +17,5 @@ az functionapp config appsettings list --name $AZURE_FUNCTION_APP --resource-gro
 
 ## Deploy the function
 ```
-func azure functionapp publish probotrobandpdx
+func azure functionapp publish $AZURE_FUNCTION_APP
 ```
