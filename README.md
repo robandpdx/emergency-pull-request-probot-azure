@@ -1,4 +1,4 @@
-# Probot azure function
+# Emergency PR GitHub App
 
 I followed the instructions [here](https://learn.microsoft.com/en-us/azure/azure-functions/create-first-function-cli-node?tabs=macos%2Cazure-cli%2Cbrowser&pivots=nodejs-model-v4#create-a-local-function-project) to setup the function.  
 
