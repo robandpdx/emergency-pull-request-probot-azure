@@ -7,21 +7,21 @@ const emergencyLabel = process.env.EMERGENCY_LABEL || 'emergency';
  * @param {import('probot').Probot} app
  */
 module.exports = (app) => {
-  //console.log("Yay! The app was loaded!");
+  //context.log("Yay! The app was loaded!");
   app.on("pull_request.labeled", async (context) => {
-    let authorized = await isAuthorized(context.payload.sender.login, context.payload.organization.login, context.octokit)
+    let authorized = await isAuthorized(context)
     if (context.payload.label.name == emergencyLabel 
         && context.payload.pull_request.merged == false  
         && authorized) {
       // emergency label exists and pull request is not merged, so do stuff...
-      console.log(`${emergencyLabel} label detected`);
+      context.log(`${emergencyLabel} label detected`);
 
       let errorsArray = [];
       let newIssue
 
       // Approve PR, if configured to do so
       if (process.env.APPROVE_PR == 'true') {
-        console.log(`Adding review to PR`);
+        context.log(`Adding review to PR`);
         await context.octokit.rest.pulls.createReview({
           owner: context.payload.repository.owner.login,
           repo: context.payload.repository.name,
@@ -29,16 +29,16 @@ module.exports = (app) => {
           body: "Approved by emergency PR bot",
           event: "APPROVE"
         }).then(response => {
-          console.log(`Review added`);
+          context.log(`Review added`);
         }).catch(error => {
-          console.log(`Error adding review: ${error}`);
+          context.log(`Error adding review: ${error}`);
           errorsArray.push(error);
         });
       }
 
       // Create issue, if configured to do so
       if (process.env.CREATE_ISSUE == 'true') {
-        console.log(`Creating issue`);
+        context.log(`Creating issue`);
         let assignees = {};
         if (typeof process.env.ISSUE_ASSIGNEES !== 'undefined' && process.env.ISSUE_ASSIGNEES != "") {
           let assigneesArray = process.env.ISSUE_ASSIGNEES.split(",");
@@ -54,10 +54,10 @@ module.exports = (app) => {
           labels: [emergencyLabel],
           ...assignees
         }).then(response => {
-          console.log(`Issue created`)
+          context.log(`Issue created`)
           newIssue = response.data.html_url;
         }).catch(error => {
-          console.log(`Error creating issue: ${error}`)
+          context.log(`Error creating issue: ${error}`)
           newIssue = 'Failed to create issue';
           errorsArray.push(error);
         });
@@ -65,7 +65,7 @@ module.exports = (app) => {
 
       // Merge PR, if configured to do so
       if (process.env.MERGE_PR == 'true') {
-        console.log(`Merging PR`);
+        context.log(`Merging PR`);
         let mergeMethod;
         if (context.payload.pull_request.base.repo.allow_merge_commit == true) {
           mergeMethod = 'merge';
@@ -80,9 +80,9 @@ module.exports = (app) => {
           pull_number: context.payload.pull_request.number,
           merge_method: mergeMethod
         }).then(response => {
-          console.log(`PR merged`);
+          context.log(`PR merged`);
         }).catch(error => {
-          console.log(`Error merging PR: ${error}`);
+          context.log(`Error merging PR: ${error}`);
           errorsArray.push(error);
         });
       }
@@ -111,21 +111,21 @@ module.exports = (app) => {
         });
 
         // Send message
-        console.log("Sending slack message");
+        context.log("Sending slack message");
         await web.chat.postMessage({
           text: slackMessage,
           channel: process.env.SLACK_CHANNEL_ID
         }).then(response => {
-          console.log(`Slack notification sent`);
+          context.log(`Slack notification sent`);
         }).catch(error => {
-          console.log(`Error sending slack notification: ${error}`);
+          context.log(`Error sending slack notification: ${error}`);
           errorsArray.push(error);
         });
       }
 
       // Return errors, or true if no errors
       if (errorsArray.length > 0) {
-        console.log(`Errors: ${errorsArray}`);
+        context.log(`Errors: ${errorsArray}`);
         throw errorsArray;
       } else {
         return true;
@@ -150,7 +150,7 @@ module.exports = (app) => {
         && ! context.payload.sender.login.endsWith("[bot]")) {
 
       // emergencyLabel was removed and it should be permanent, so do stuff...
-      console.log(`Reaplying ${emergencyLabel} label to PR: ${context.payload.pull_request.html_url}`);
+      context.log(`Reaplying ${emergencyLabel} label to PR: ${context.payload.pull_request.html_url}`);
 
       let errorsArray = [];
 
@@ -161,15 +161,15 @@ module.exports = (app) => {
         issue_number: context.payload.pull_request.number,
         labels: [emergencyLabel]
       }).then(response => {
-        console.log(`${emergencyLabel} label reapplied to PR: ${context.payload.pull_request.html_url}`);
+        context.log(`${emergencyLabel} label reapplied to PR: ${context.payload.pull_request.html_url}`);
       }).catch(error => {
-        console.log(`Error reapplying ${emergencyLabel} label: ${error} to PR: ${context.payload.pull_request.html_url}`);
+        context.log(`Error reapplying ${emergencyLabel} label: ${error} to PR: ${context.payload.pull_request.html_url}`);
         errorsArray.push(error);
       });
 
       // Return errors, or true if no errors
       if (errorsArray.length > 0) {
-        console.log(`Errors: ${errorsArray}`);
+        context.log(`Errors: ${errorsArray}`);
         throw errorsArray;
       } else {
         return true;
@@ -183,7 +183,7 @@ module.exports = (app) => {
         && ! context.payload.sender.login.endsWith("[bot]")) {
 
       // emergencyLabel was removed and it should be permanent, so do stuff...
-      console.log(`Reaplying ${emergencyLabel} label to PR: ${context.payload.issue.html_url}`);
+      context.log(`Reaplying ${emergencyLabel} label to PR: ${context.payload.issue.html_url}`);
 
       let errorsArray = [];
 
@@ -194,15 +194,15 @@ module.exports = (app) => {
         issue_number: context.payload.issue.number,
         labels: [emergencyLabel]
       }).then(response => {
-        console.log(`${emergencyLabel} label reapplied to PR: ${context.payload.issue.html_url}`);
+        context.log(`${emergencyLabel} label reapplied to PR: ${context.payload.issue.html_url}`);
       }).catch(error => {
-        console.log(`Error reapplying ${emergencyLabel} label: ${error} to PR: ${context.payload.issue.html_url}`);
+        context.log(`Error reapplying ${emergencyLabel} label: ${error} to PR: ${context.payload.issue.html_url}`);
         errorsArray.push(error);
       });
 
       // Return errors, or true if no errors
       if (errorsArray.length > 0) {
-        console.log(`Errors: ${errorsArray}`);
+        context.log(`Errors: ${errorsArray}`);
         throw errorsArray;
       } else {
         return true;
@@ -211,7 +211,7 @@ module.exports = (app) => {
   });
 
   app.on("pull_request.opened", async (context) => {
-    let authorized = await isAuthorized(context.payload.sender.login, context.payload.organization.login, context.octokit)
+    let authorized = await isAuthorized(context)
     if (context.payload.pull_request.body.toLocaleLowerCase().includes(process.env.TRIGGER_STRING) 
         && authorized) {
 
@@ -223,16 +223,16 @@ module.exports = (app) => {
         issue_number: context.payload.pull_request.number,
         labels: [emergencyLabel]
       }).then(response => {
-        console.log(`${emergencyLabel} label applied to PR: ${context.payload.pull_request.html_url}`);
+        context.log(`${emergencyLabel} label applied to PR: ${context.payload.pull_request.html_url}`);
         newIssue = response.data.html_url;
       }).catch(error => {
-        console.log(`Error applying ${emergencyLabel} label: ${error} to PR: ${context.payload.pull_request.html_url}`);
+        context.log(`Error applying ${emergencyLabel} label: ${error} to PR: ${context.payload.pull_request.html_url}`);
         errorsArray.push(error);
       });
 
       // Return errors, or true if no errors
       if (errorsArray.length > 0) {
-        console.log(`Errors: ${errorsArray}`);
+        context.log(`Errors: ${errorsArray}`);
         throw errorsArray;
       } else {
         return true;
@@ -244,7 +244,7 @@ module.exports = (app) => {
   });
 
   app.on("issue_comment.created", async (context) => {
-    let authorized = await isAuthorized(context.payload.sender.login, context.payload.organization.login, context.octokit)
+    let authorized = await isAuthorized(context)
     if (context.payload.issue.pull_request 
         && context.payload.comment.body.toLocaleLowerCase().includes(process.env.TRIGGER_STRING) 
         && authorized) {
@@ -257,16 +257,16 @@ module.exports = (app) => {
         issue_number: context.payload.issue.number,
         labels: [emergencyLabel]
       }).then(response => {
-        console.log(`${emergencyLabel} label applied to PR: ${context.payload.issue.pull_request.html_url}`);
+        context.log(`${emergencyLabel} label applied to PR: ${context.payload.issue.pull_request.html_url}`);
         newIssue = response.data.html_url;
       }).catch(error => {
-        console.log(`Error applying ${emergencyLabel} label: ${error} to PR: ${context.payload.issue.pull_request.html_url}`);
+        context.log(`Error applying ${emergencyLabel} label: ${error} to PR: ${context.payload.issue.pull_request.html_url}`);
         errorsArray.push(error);
       });
 
       // Return errors, or true if no errors
       if (errorsArray.length > 0) {
-        console.log(`Errors: ${errorsArray}`);
+        context.log(`Errors: ${errorsArray}`);
         throw errorsArray;
       } else {
         return true;
@@ -279,18 +279,22 @@ module.exports = (app) => {
   });
 };
 
-async function isAuthorized(login, org, octokit) {
+async function isAuthorized(context) {
+  let login = context.payload.sender.login;
+  let org = context.payload.organization.login;
+  let octokit = context.octokit;
+
   // check if process.env.AUTHORIZED_TEAM  is defined
   if (process.env.AUTHORIZED_TEAM == undefined || process.env.AUTHORIZED_TEAM == "") {
-      console.log("No authorized team specified. Skipping authorization check.")
+      context.log("No authorized team specified. Skipping authorization check.")
       return true;
   }
   // if login ends with [bot] then it's a bot and we don't need to check
   if (login.endsWith("[bot]")) {
-      console.log("Bot detected. Skipping authorization check.")
+      context.log("Bot detected. Skipping authorization check.")
       return true;
   }
-  console.log(`Checking if ${login} is a member of ${org}/${process.env.AUTHORIZED_TEAM} team`)
+  context.log(`Checking if ${login} is a member of ${org}/${process.env.AUTHORIZED_TEAM} team`)
   try {
       let membership = await octokit.request(`GET /orgs/${org}/teams/${process.env.AUTHORIZED_TEAM}/memberships/${login}`, {
           org: org,
@@ -299,20 +303,20 @@ async function isAuthorized(login, org, octokit) {
       })
 
       if (membership.data.state == 'active') {
-          console.log( "Membership active")
+          context.log( "Membership active")
           return true;
       } else {
-          console.log( "Membership not active")
+          context.log( "Membership not active")
           return false;
 
       }
   } catch (error) {
       if (error.status == 404) {
-        console.log("Membership not found")
+        context.log("Membership not found")
         return false;
       } else {
-        console.log(`error: ${error}`);
-        console.log("Error checking membership. Check the ADMIN_OPS_ORG and ACTIONS_APPROVER_TEAM variables.")
+        context.log(`error: ${error}`);
+        context.log("Error checking membership. Check the ADMIN_OPS_ORG and ACTIONS_APPROVER_TEAM variables.")
         throw new Error("Error checking membership");
       }
   }
@@ -329,14 +333,14 @@ async function postUnauthorizedIssueComment(context) {
     issue_number: number,
     body: `@${context.payload.sender.login} is not authorized to apply the emergency label.`
   }).then(response => {
-    console.log(`Commented on issue: ${url}`);
+    context.log(`Commented on issue: ${url}`);
   }).catch(error => {
-    console.log(`Error commenting on issue: ${error} to PR: ${url}`);
+    context.log(`Error commenting on issue: ${error} to PR: ${url}`);
     errorsArray.push(error);
   });
 
   if (errorsArray.length > 0) {
-    console.log(`Errors: ${errorsArray}`);
+    context.log(`Errors: ${errorsArray}`);
     throw errorsArray;
   } else {
     return true;
