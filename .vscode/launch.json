@@ -8,6 +8,24 @@
             "restart": true,
             "port": 9229,
             "preLaunchTask": "func: host start"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha",
+            "runtimeExecutable": "nyc",
+            "runtimeArgs": [
+                "--reporter=lcov",
+                "--reporter=cobertura",
+                "--reporter=text-summary",
+                "mocha",
+                "--timeout",
+                "999999",
+                "--colors",
+                "${workspaceFolder}"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceRoot}/",
         }
     ]
 }
