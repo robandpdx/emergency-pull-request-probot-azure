@@ -1,6 +1,6 @@
-# Emergency PR GitHub App
+# Emergency PR GitHub App - Azure Function
 
-This project is a probot app deploying to an [Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview?pivots=programming-language-csharp). The purpose of this app is to provide a way for developers to bypass approval and checks in order to merge an emergency change to the protected main branch while ensuring that this bypass doesn't go unnoticed by creating an issue and/or slack notification.
+This project is a probot app deploying to an [Azure Function](https://learn.microsoft.com/en-us/azure/azure-functions/functions-overview?pivots=programming-language-csharp). This project is based on [emergency-pull-request-probot-app](https://github.com/github/emergency-pull-request-probot-app), and the code is basically the same. The purpose of this app is to provide a way for developers to bypass approval and checks in order to merge an emergency change to the protected main branch while ensuring that this bypass doesn't go unnoticed by creating an issue and/or slack notification.
 
 The app listens for [Pull Request events](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types#pullrequestevent) where action=`labeled` and can do 4 things:
 1. Approve an emergency PR
@@ -115,4 +115,4 @@ Then send in a paylaod from Github by configuring the webhook URL to $WEBHOOK_PR
  - If you change the settings in `.env`, close vscode and relaunch from the terminal after loading changes from direnv.  
  - I'm not sure why the integrated probot smee client does not work. Need to use the use the smee client separately as described above.  
  - To see vebose logging while debugging, edit the task.json, `"command": "host start --verbose",`.  
- - Slack notification does not work! The `@slack/web-api` will not send a message from within an azure function. [See this issue for more details.](https://github.com/slackapi/node-slack-sdk/issues/2151)  
+ - Slack notification does not work! The `@slack/web-api` will not send a message from within an azure function. [See this issue for more details](https://github.com/slackapi/node-slack-sdk/issues/2151). If you need slack notifications, you can deploy [the docker container from the original project](https://github.com/github/emergency-pull-request-probot-app/pkgs/container/emergency-pull-request-probot-app).  
