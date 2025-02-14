@@ -1,7 +1,7 @@
 {
-  "name": "",
+  "name": "emergency-pull-request-probot-azure",
   "version": "1.0.0",
-  "description": "",
+  "description": "GitHub App for emergency pull requests",
   "main": "src/functions/*.js",
   "scripts": {
     "start": "func start",
@@ -10,6 +10,7 @@
   "dependencies": {
     "@azure/functions": "^4.0.0",
     "@probot/adapter-azure-functions": "^1.1.0",
+    "@slack/web-api": "^7.8.0",
     "probot": "^13.4.3"
   },
   "devDependencies": {
