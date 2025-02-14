@@ -14,6 +14,11 @@
     "probot": "^13.4.3"
   },
   "devDependencies": {
-    "azure-functions-core-tools": "^4.x"
+    "azure-functions-core-tools": "^4.x",
+    "mocha": "^11.1.0",
+    "nock": "^14.0.1",
+    "nyc": "^17.1.0",
+    "smee-client": "^2.0.4",
+    "uvu": "^0.5.6"
   }
 }
