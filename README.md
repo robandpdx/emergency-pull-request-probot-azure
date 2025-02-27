@@ -115,4 +115,3 @@ Then send in a paylaod from Github by configuring the webhook URL to $WEBHOOK_PR
  - If you change the settings in `.env`, close vscode and relaunch from the terminal after loading changes from direnv.  
  - I'm not sure why the integrated probot smee client does not work. Need to use the use the smee client separately as described above.  
  - To see vebose logging while debugging, edit the task.json, `"command": "host start --verbose",`.  
- - Slack notification does not work! The `@slack/web-api` will not send a message from within an azure function. [See this issue for more details](https://github.com/slackapi/node-slack-sdk/issues/2151). If you need slack notifications, you can deploy [the docker container from the original project](https://github.com/github/emergency-pull-request-probot-app/pkgs/container/emergency-pull-request-probot-app).  
