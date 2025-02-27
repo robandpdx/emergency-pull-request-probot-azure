@@ -108,6 +108,9 @@ module.exports = (app) => {
         // Initialize
         const web = new WebClient(token, {
           retryConfig: retryConfig,
+          headers: {
+            'User-Agent': 'MyApp/1.0'
+          }
         });
 
         // Send message
