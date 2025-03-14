@@ -11,7 +11,7 @@
     "@azure/functions": "^4.7.0",
     "@probot/adapter-azure-functions": "^1.1.0",
     "@slack/web-api": "^7.8.0",
-    "probot": "^13.4.3"
+    "probot": "^13.4.4"
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x",
