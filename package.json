@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "azure-functions-core-tools": "^4.x",
-    "mocha": "^11.2.2",
+    "mocha": "^11.3.0",
     "nock": "^14.0.4",
     "nyc": "^17.1.0",
     "smee-client": "^3.1.1",
