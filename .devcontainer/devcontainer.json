@@ -19,7 +19,9 @@
 		"donjayamanne.git-extension-pack",
 		"redhat.vscode-yaml",
 		"github.copilot",
-		"ms-azuretools.vscode-docker"
+		"ms-azuretools.vscode-docker",
+		"ms-azuretools.vscode-azurefunctions",
+		"ms-azuretools.vscode-azurestorage"
 	],
 
 	"portsAttributes": {
@@ -27,6 +29,18 @@
 			"label": "probot",
 			"onAutoForward": "notify",
             "requireLocalPort": true
+		},
+		"10000": {
+			"label": "Azurite Blob Service",
+			"onAutoForward": "silent"
+		},
+		"10001": {
+			"label": "Azurite Queue Service",
+			"onAutoForward": "silent"
+		},
+		"10002": {
+			"label": "Azurite Table Service",
+			"onAutoForward": "silent"
 		}
 	},
 
