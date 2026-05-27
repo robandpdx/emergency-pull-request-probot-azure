@@ -214,6 +214,10 @@ module.exports = (app) => {
   });
 
   app.on("pull_request.opened", async (context) => {
+    if (process.env.TRIGGER_STRING == undefined || process.env.TRIGGER_STRING == "") {
+      context.log("No trigger string specified. Skipping auto-label check.");
+      return;
+    }
     let authorized = await isAuthorized(context)
     if (context.payload.pull_request.body.toLocaleLowerCase().includes(process.env.TRIGGER_STRING) 
         && authorized) {
@@ -247,6 +251,10 @@ module.exports = (app) => {
   });
 
   app.on("issue_comment.created", async (context) => {
+    if (process.env.TRIGGER_STRING == undefined || process.env.TRIGGER_STRING == "") {
+      context.log("No trigger string specified. Skipping auto-label check.");
+      return;
+    }
     let authorized = await isAuthorized(context)
     if (context.payload.issue.pull_request 
         && context.payload.comment.body.toLocaleLowerCase().includes(process.env.TRIGGER_STRING) 
