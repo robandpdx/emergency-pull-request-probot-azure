@@ -1,11 +1,11 @@
 # See here for image contents: https://github.com/microsoft/vscode-dev-containers/tree/v0.195.0/containers/javascript-node/.devcontainer/base.Dockerfile
 # [Choice] Node.js version (use -bullseye variants on local arm64/Apple Silicon): 16, 14, 12, 16-bullseye, 14-bullseye, 12-bullseye, 16-buster, 14-buster, 12-buster
-ARG VARIANT=20-bullseye
-FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
+ARG VARIANT=24-trixie
+FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:${VARIANT}
 
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-     && apt-get -y install --no-install-recommends python pip
+     && apt-get -y install --no-install-recommends python3 python3-pip python-is-python3 pipx
 
 # [Optional] Uncomment if you want to install an additional version of node using nvm
 # ARG EXTRA_NODE_VERSION=10
@@ -14,17 +14,16 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # [Optional] Uncomment if you want to install more global node modules
 # RUN su node -c "npm install -g <your-package-list-here>"
 
-# Install Azure Functions Core Tools
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
-    mv microsoft.gpg /etc/apt/trusted.gpg.d/microsoft.gpg && \
-    echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main" > /etc/apt/sources.list.d/dotnetdev.list && \
-    apt-get update && \
-    apt-get install -y azure-functions-core-tools-4
+# Install Azure Functions Core Tools (via npm so it works on both amd64 and arm64).
+# The Microsoft apt repo only ships amd64 .deb packages, which fails on Apple Silicon.
+RUN su node -c "npm install -g azure-functions-core-tools@4 --unsafe-perm true"
 
 # Install Azurite (Azure Storage Emulator)
 RUN su node -c "npm install -g azurite"
 
 # Intall aws cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
-# Install sam cli
-RUN pip install aws-sam-cli
+# Install sam cli (use pipx because Debian Trixie's Python is PEP 668 externally-managed)
+RUN pipx install aws-sam-cli \
+    && pipx ensurepath \
+    && ln -s /root/.local/bin/sam /usr/local/bin/sam
