@@ -8,7 +8,7 @@
     "test": "nyc --reporter=lcov --reporter=cobertura --reporter=text --reporter=text-summary uvu"
   },
   "dependencies": {
-    "@azure/functions": "^4.16.0",
+    "@azure/functions": "^4.16.1",
     "@probot/adapter-azure-functions": "^1.1.0",
     "@slack/web-api": "^7.17.0",
     "probot": "^14.3.2"
