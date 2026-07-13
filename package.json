@@ -10,7 +10,7 @@
   "dependencies": {
     "@azure/functions": "^4.16.1",
     "@probot/adapter-azure-functions": "^1.1.0",
-    "@slack/web-api": "^7.18.0",
+    "@slack/web-api": "^7.19.0",
     "probot": "^14.3.2"
   },
   "devDependencies": {
