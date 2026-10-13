@@ -1,7 +1,7 @@
 const { suite } = require("uvu");
 const assert = require("uvu/assert");
 
-const nock = require("nock");
+const nock = require("nock").default;
 nock.disableNetConnect();
 
 const {
@@ -1075,8 +1075,13 @@ test("receives pull_request.opened event, applies emergency label", async functi
 test("receives pull_request.opened event, applies emergency label checking team membership", async function () {
   process.env.AUTHORIZED_TEAM = 'emergency-team'
 
-  // mock the request to apply the emergency label
+  // mock the request to check if the user is a member of the emergency team
   const mock = nock("https://api.github.com")
+    .get(`/orgs/robandpdx/teams/emergency-team/memberships/robandpdx?org=robandpdx&team_slug=emergency-team&username=robandpdx`)
+    .reply(200, payloadMembershipResponse);
+
+  // mock the request to apply the emergency label
+  mock
     .post("/repos/robandpdx/superbigmono/issues/1/labels",
       (requestBody) => {
         assert.equal(requestBody.labels[0], "emergency");
@@ -1084,10 +1089,6 @@ test("receives pull_request.opened event, applies emergency label checking team 
       }
     )
     .reply(200);
-
-  // mock the request to check if the user is a member of the emergency team
-  mock.get(`/orgs/robandpdx/teams/emergency-team/memberships/robandpdx?org=robandpdx&team_slug=emergency-team&username=robandpdx`)
-  .reply(200, payloadMembershipResponse);
 
   await probot.receive(payloadPrOpened);
   assert.equal(mock.pendingMocks(), []);
@@ -1162,19 +1163,18 @@ test("receives issue_comment.created event, applies emergency label", async func
 test("receives issue_comment.created event, applies emergency label", async function () {
   process.env.AUTHORIZED_TEAM = 'emergency-team'
 
-  // mock the request to apply the emergency label
-  const mock = nock("https://api.github.com")
-    .post("/repos/robandpdx/superbigmono/issues/1/labels",
-      (requestBody) => {
-        assert.equal(requestBody.labels[0], "emergency");
-        return true;
-      }
-    )
-    .reply(200);
-
   // mock the request to check if the user is a member of the emergency team
-  mock.get(`/orgs/robandpdx/teams/emergency-team/memberships/robandpdx?org=robandpdx&team_slug=emergency-team&username=robandpdx`)
-  .reply(200, payloadMembershipResponse);
+  const mock = nock("https://api.github.com")
+    .get(`/orgs/robandpdx/teams/emergency-team/memberships/robandpdx?org=robandpdx&team_slug=emergency-team&username=robandpdx`)
+    .reply(200, payloadMembershipResponse);
+
+  // mock the request to apply the emergency label
+  mock.post("/repos/robandpdx/superbigmono/issues/1/labels",
+    (requestBody) => {
+      assert.equal(requestBody.labels[0], "emergency");
+      return true;
+    }
+  ).reply(200);
 
   await probot.receive(payloadPrComment);
   assert.equal(mock.pendingMocks(), []);
